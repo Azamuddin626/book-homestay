@@ -1,0 +1,72 @@
+/* resources/css/app.css */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+
+/* Overall page style with a vintage wood-like background and font */
+body {
+    background-color: #f4f0e6;
+    /* Creamy background for a vintage feel */
+    font-family: 'Merriweather', serif;
+    color: #5e503f;
+    /* Soft brown text */
+    padding: 20px;
+}
+
+#pakej-section {
+    background-color: #f4f0e6;
+    font-family: 'Merriweather', serif;
+    color: #5e503f;
+    padding-top: 20px;
+}
+
+.hero-gradient {
+    background: linear-gradient(135deg, #38b2ac, #34d399, #4ade80);
+    background-size: 400% 400%;
+    animation: gradientBackground 8s ease infinite;
+}
+
+@keyframes gradientBackground {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.animate-float {
+    animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.scroll-animation {
+    animation: scrollAnimation 20s linear infinite;
+}
+
+@keyframes scrollAnimation {
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
