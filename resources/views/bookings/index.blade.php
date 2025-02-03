@@ -57,6 +57,7 @@
             }
         }
     </script>
+
 </head>
 
 <body class="bg-green-50">
@@ -209,13 +210,21 @@
                         </div>
                         <!-- Tarikh Check-In -->
                         <div>
-                            <label class="block font-medium">Tarikh Check-In</label>
-                            <input type="date" name="check_in" id="edit_check_in" class="w-full p-2 border rounded">
+                            <label class="block font-medium text-green-900">Tarikh Check-In</label>
+                            <input type="date" name="check_in" id="check_in" value="{{ old('check_in') }}"
+                                class="w-full p-2 border rounded">
+                            @error('check_in')
+                                <span class="text-red-600">{{ $message }}</span>
+                            @enderror
                         </div>
                         <!-- Tarikh Check-Out -->
                         <div>
-                            <label class="block font-medium">Tarikh Check-Out</label>
-                            <input type="date" name="check_out" id="edit_check_out" class="w-full p-2 border rounded">
+                            <label class="block font-medium text-green-900">Tarikh Check-Out</label>
+                            <input type="date" name="check_out" id="check_out" value="{{ old('check_out') }}"
+                                class="w-full p-2 border rounded">
+                            @error('check_out')
+                                <span class="text-red-600">{{ $message }}</span>
+                            @enderror
                         </div>
                         <!-- Bilangan Dewasa -->
                         <div>
@@ -246,7 +255,7 @@
                     </div>
                 </form>
                 <!-- Delete Form -->
-                <form id="deleteForm" method="POST" class="mt-2">
+                <form id="deleteForm" method="POST" class="mt-  2">
                     @csrf
                     @method('DELETE')
                     <button type="button" onclick="deleteBooking()"
@@ -255,6 +264,34 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const checkInInput = document.getElementById('check_in');
+            const checkOutInput = document.getElementById('check_out');
+
+            checkInInput.addEventListener('change', function () {
+                // When a check-in date is selected, set the check-out's min attribute to the same date
+                let checkInDate = this.value;
+                if (checkInDate) {
+                    // Optionally, you can also add one day to ensure check-out is after check-in.
+                    // For example, if you need check-out to be at least the day after:
+                    let dateObj = new Date(checkInDate);
+                    dateObj.setDate(dateObj.getDate() + 1);
+                    // Format dateObj to YYYY-MM-DD:
+                    let year = dateObj.getFullYear();
+                    let month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+                    let day = ('0' + dateObj.getDate()).slice(-2);
+                    let minDate = `${year}-${month}-${day}`;
+
+                    checkOutInput.setAttribute('min', minDate);
+                } else {
+                    // If check-in is cleared, remove min attribute from check-out.
+                    checkOutInput.removeAttribute('min');
+                }
+            });
+        });
+    </script>
+
 </body>
 
 </html>
