@@ -19,13 +19,24 @@ class BookingController extends Controller
     /**
      * Return all bookings as events for FullCalendar.
      */
-    public function getEvents()
+    public function getEvents(Request $request)
     {
-        $bookings = Booking::all();
+        $query = Booking::query();
+
+        // Apply filters
+        if ($request->has('tujuan')) {
+            $query->where('tujuan', $request->tujuan);
+        }
+        
+        if ($request->has('homestay')) {
+            $query->where('homestay', $request->homestay);
+        }
+
+        $bookings = $query->get();
         $events = [];
 
         foreach ($bookings as $booking) {
-            // FullCalendar uses an exclusive end date, so add one day.
+            // FullCalendar uses an exclusive end date, so add one day
             $end = date('Y-m-d', strtotime($booking->check_out . ' +1 day'));
             $events[] = [
                 'id'    => $booking->id,
@@ -154,6 +165,14 @@ class BookingController extends Controller
     }
 
     /**
+     * Display the public calendar view.
+     */
+    public function publicCalendar()
+    {
+        return view('bookings.public-calendar');
+    }
+
+    /**
      * Show a separate edit page (for list view editing).
      */
     public function editPage($id)
@@ -161,5 +180,43 @@ class BookingController extends Controller
         $booking = Booking::findOrFail($id);
         return view('bookings.edit', compact('booking'));
     }
-}
 
+    /**
+     * Update booking dates via drag and drop.
+     */
+    public function updateDates(Request $request, $id)
+    {
+        $booking = Booking::findOrFail($id);
+        
+        $validator = Validator::make($request->all(), [
+            'check_in'  => 'required|date',
+            'check_out' => 'required|date|after_or_equal:check_in',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()]);
+        }
+
+        // Check for overlapping bookings
+        $existing = Booking::where('homestay', $booking->homestay)
+            ->where('id', '!=', $id)
+            ->where(function($query) use ($request) {
+                $query->whereBetween('check_in', [$request->check_in, $request->check_out])
+                      ->orWhereBetween('check_out', [$request->check_in, $request->check_out])
+                      ->orWhere(function($q) use ($request) {
+                          $q->where('check_in', '<=', $request->check_in)
+                            ->where('check_out', '>=', $request->check_out);
+                      });
+            })->first();
+
+        if ($existing) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Homestay telah ditempah pada tarikh tersebut.'
+            ]);
+        }
+
+        $booking->update($request->only(['check_in', 'check_out']));
+        return response()->json(['success' => true]);
+    }
+}

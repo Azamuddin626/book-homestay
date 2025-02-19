@@ -1,23 +1,18 @@
-<!DOCTYPE html>
-<html lang="ms">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kemaskini Tempahan</title>
-    <!-- Tailwind CSS via CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-green-50">
+@extends('layouts.layout')
+
+@section('title', 'Kemaskini Tempahan')
+
+@section('content')
     <div class="container mx-auto p-4">
         <div class="flex justify-between items-center mb-4">
-            <h1 class="text-3xl font-bold text-green-800">Kemaskini Tempahan</h1>
-            <a href="{{ route('bookings.list') }}" class="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800">
+            <h1 class="text-3xl font-bold text-nature-bark dark:text-white">Kemaskini Tempahan</h1>
+            <a href="{{ route('bookings.list') }}" class="bg-nature-fern hover:bg-nature-moss text-white px-4 py-2 rounded-lg transition duration-300">
                 Kembali
             </a>
         </div>
 
         @if ($errors->any())
-            <div class="bg-red-200 text-red-800 p-2 mb-4 rounded">
+            <div class="bg-red-50 text-red-800 p-4 mb-4 rounded-lg">
                 <ul>
                     @foreach ($errors->all() as $error)
                         <li>- {{ $error }}</li>
@@ -26,9 +21,10 @@
             </div>
         @endif
 
-        <div class="bg-white p-6 rounded shadow" style="background-color: #d2b48c;>
+        <div class="bg-nature-stone p-6 rounded-lg shadow-sm border border-nature-clay">
             <form action="{{ route('bookings.update', $booking->id) }}" method="POST">
                 @csrf
+                @method('PUT')
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Tujuan Menyewa -->
                     <div>
@@ -97,5 +93,26 @@
             </form>
         </div>
     </div>
-</body>
-</html>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkInInput = document.getElementById('check_in');
+        const checkOutInput = document.getElementById('check_out');
+
+        // Ensure check-out date is not before check-in date
+        checkInInput.addEventListener('change', function() {
+            if (checkOutInput.value && checkOutInput.value < this.value) {
+                checkOutInput.value = this.value;
+            }
+            checkOutInput.min = this.value;
+        });
+
+        // Set initial min date for check-out based on check-in
+        if (checkInInput.value) {
+            checkOutInput.min = checkInInput.value;
+        }
+    });
+</script>
+@endsection
