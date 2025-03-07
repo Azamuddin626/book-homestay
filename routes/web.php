@@ -2,30 +2,30 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookingController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
 // Public routes
-Route::get('/welcome', function () {
+Route::get('/', function () {
     return view('welcome');
 });
 
 Route::get('/public-calendar', [BookingController::class, 'publicCalendar'])->name('calendar.public');
 Route::get('/bookings/events', [BookingController::class, 'getEvents'])->name('bookings.events');
 
-// Authentication routes
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [LoginController::class, 'login']);
-    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-    Route::post('/register', [RegisterController::class, 'register']);
-});
+// Authentication routes provided by Laravel Breeze
+require __DIR__.'/auth.php';
 
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
+// Login and Register routes
+Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+Route::post('/register', [RegisteredUserController::class, 'store']);
+Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
 // Admin routes
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/', [BookingController::class, 'index'])->name('index');
+    Route::get('/index', [BookingController::class, 'index'])->name('index');
     Route::get('/calendar', [BookingController::class, 'publicCalendar'])->name('calendar.public');
     Route::get('/bookings/list', [BookingController::class, 'list'])->name('bookings.list');
     Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
@@ -35,3 +35,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/bookings/{id}/edit-page', [BookingController::class, 'editPage'])->name('bookings.editPage');
     Route::post('/bookings/{id}/update-dates', [BookingController::class, 'updateDates'])->name('bookings.updateDates');
 });
+
+// Dashboard route
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth'])->name('dashboard');

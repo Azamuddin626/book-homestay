@@ -1,54 +1,47 @@
-@extends('layouts.layout')
+<x-guest-layout>
+    <!-- Session Status -->
+    <x-auth-session-status class="mb-4" :status="session('status')" />
 
-@section('title', 'Login')
+    <form method="POST" action="{{ route('login') }}">
+        @csrf
 
-@section('content')
-<div class="container mx-auto p-4">
-    <div class="max-w-md mx-auto bg-nature-stone p-6 rounded-lg shadow-sm border border-nature-clay">
-        <h2 class="text-2xl font-bold text-nature-bark mb-6">Login</h2>
+        <!-- Email Address -->
+        <div>
+            <x-input-label for="email" :value="__('Email')" />
+            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        </div>
 
-        @if ($errors->any())
-            <div class="bg-red-50 text-red-800 p-4 mb-4 rounded-lg">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        <!-- Password -->
+        <div class="mt-4">
+            <x-input-label for="password" :value="__('Password')" />
 
-        <form method="POST" action="{{ route('login') }}">
-            @csrf
+            <x-text-input id="password" class="block mt-1 w-full"
+                            type="password"
+                            name="password"
+                            required autocomplete="current-password" />
 
-            <div class="mb-4">
-                <label for="email" class="block text-nature-bark mb-2">Email</label>
-                <input type="email" name="email" id="email" class="w-full p-2 border rounded-lg" required autofocus>
-            </div>
+            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        </div>
 
-            <div class="mb-6">
-                <label for="password" class="block text-nature-bark mb-2">Password</label>
-                <input type="password" name="password" id="password" class="w-full p-2 border rounded-lg" required>
-            </div>
-            <div class="flex items-center">
-                <input id="show-password" type="checkbox" class="mr-2" onclick="togglePasswordVisibility()">
-                <label for="show-password" class="text-sm">Show Password</label>
-            </div>
-            <div class="flex items-center justify-between">
-                <button type="submit" class="bg-nature-fern hover:bg-nature-moss text-white font-bold py-2 px-4 rounded-lg transition duration-300">
-                    Login
-                </button>
-                <a href="{{ route('register') }}" class="text-nature-fern hover:text-nature-moss transition duration-300">
-                    Register
+        <!-- Remember Me -->
+        <div class="block mt-4">
+            <label for="remember_me" class="inline-flex items-center">
+                <input id="remember_me" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
+                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
+            </label>
+        </div>
+
+        <div class="flex items-center justify-end mt-4">
+            @if (Route::has('password.request'))
+                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
+                    {{ __('Forgot your password?') }}
                 </a>
-            </div>
-        </form>
-    </div>
-</div>
-<script>
-    function togglePasswordVisibility() {
-        const passwordField = document.getElementById('password');
-        const passwordFieldType = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordField.setAttribute('type', passwordFieldType);
-    }
-    </script>
-@endsection
+            @endif
+
+            <x-primary-button class="ms-3">
+                {{ __('Log in') }}
+            </x-primary-button>
+        </div>
+    </form>
+</x-guest-layout>
