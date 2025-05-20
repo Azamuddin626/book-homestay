@@ -21,9 +21,10 @@
                         </div>
                         <div class="hidden md:block">
                             <div class="ml-10 flex items-baseline space-x-4">
-                                <x-nav-link href="/home" :active="request()->is('/')">Home</x-nav-link>
-                                <x-nav-link href="/jobs" :active="request()->is('jobs')">Jobs</x-nav-link>
-                                <x-nav-link href="/contact" :active="request()->is('contact')">Contact</x-nav-link>
+                                <x-navbar-link href="/home" :active="request()->is('/')">Home</x-navbar-link>
+                                <x-navbar-link href="/jobs" :active="request()->is('jobs')">Jobs</x-navbar-link>
+                                <x-navbar-link href="/contact" :active="request()->is('contact')">Contact
+                                </x-navbar-link>
                             </div>
                         </div>
                     </div>
@@ -93,8 +94,7 @@
                 <div class="border-t border-gray-700 pb-3 pt-4">
                     <div class="flex items-center px-5">
                         <div class="shrink-0">
-                            <img class="h-10 w-10 rounded-full" src="{{ asset('assets\images\9k.png') }}"
-                                alt="">
+                            <img class="h-10 w-10 rounded-full" src="{{ asset('assets\images\9k.png') }}" alt="">
                         </div>
                         <div class="ml-3">
                             <div class="text-base/5 font-medium text-white">Ajam</div>

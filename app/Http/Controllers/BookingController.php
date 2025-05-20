@@ -24,11 +24,22 @@ class BookingController extends Controller
         $query = Booking::query();
 
         // Apply filters
-        if ($request->has('tujuan')) {
+        if ($request->has('tujuan') && $request->has('homestay')) {
+            // If both tujuan and homestay filters are provided, show bookings that match either:
+            // 1. The selected tujuan + homestay combination
+            // 2. Kenduri bookings for the selected homestay (regardless of the selected tujuan)
+            $query->where(function ($q) use ($request) {
+                $q->where(function ($inner) use ($request) {
+                    $inner->where('tujuan', $request->tujuan)
+                        ->where('homestay', $request->homestay);
+                })->orWhere(function ($inner) use ($request) {
+                    $inner->where('tujuan', 'Kenduri')
+                        ->where('homestay', $request->homestay);
+                });
+            });
+        } else if ($request->has('tujuan')) {
             $query->where('tujuan', $request->tujuan);
-        }
-        
-        if ($request->has('homestay')) {
+        } else if ($request->has('homestay')) {
             $query->where('homestay', $request->homestay);
         }
 
@@ -67,30 +78,69 @@ class BookingController extends Controller
             'check_out'     => 'required|date|after_or_equal:check_in',
             'dewasa'        => 'required|integer|min:0',
             'kanak'         => 'required|integer|min:0',
-            'homestay'      => 'required|in:Rumah Kayu Merbau,Rumah Batu Jati,Rumah Batu Meranti',
+            'homestay'      => 'required|in:Rumah Kayu Merbau,Rumah Batu Jati,Rumah Batu Meranti,Semua Rumah',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        // Check if the same homestay is already booked on any overlapping date.
-        $existing = Booking::where('homestay', $request->homestay)
-            ->where(function($query) use ($request) {
-                $query->whereBetween('check_in', [$request->check_in, $request->check_out])
-                      ->orWhereBetween('check_out', [$request->check_in, $request->check_out])
-                      ->orWhere(function($q) use ($request) {
-                          $q->where('check_in', '<=', $request->check_in)
-                            ->where('check_out', '>=', $request->check_out);
-                      });
-            })->first();
+        // Special handling for "Semua Rumah" (All Houses) option
+        if ($request->homestay === 'Semua Rumah') {
+            $homestays = ['Rumah Kayu Merbau', 'Rumah Batu Jati', 'Rumah Batu Meranti'];
+            $success = true;
+            $conflictHomestay = null;
 
-        if ($existing) {
-            return redirect()->back()->with('error', 'Homestay telah ditempah pada tarikh tersebut.');
+            // First, check if any of the homestays are already booked for the selected dates
+            foreach ($homestays as $homestay) {
+                $existing = Booking::where('homestay', $homestay)
+                    ->where(function ($query) use ($request) {
+                        $query->whereBetween('check_in', [$request->check_in, $request->check_out])
+                            ->orWhereBetween('check_out', [$request->check_in, $request->check_out])
+                            ->orWhere(function ($q) use ($request) {
+                                $q->where('check_in', '<=', $request->check_in)
+                                    ->where('check_out', '>=', $request->check_out);
+                            });
+                    })->first();
+
+                if ($existing) {
+                    $success = false;
+                    $conflictHomestay = $homestay;
+                    break;
+                }
+            }
+
+            if (!$success) {
+                return redirect()->back()->with('error', $conflictHomestay . ' telah ditempah pada tarikh tersebut.');
+            }
+
+            // If all homestays are available, create a booking for each
+            foreach ($homestays as $homestay) {
+                $bookingData = $request->all();
+                $bookingData['homestay'] = $homestay;
+                Booking::create($bookingData);
+            }
+
+            return redirect()->back()->with('success', 'Tempahan untuk semua rumah berjaya disimpan.');
+        } else {
+            // Original logic for individual homestay booking
+            $existing = Booking::where('homestay', $request->homestay)
+                ->where(function ($query) use ($request) {
+                    $query->whereBetween('check_in', [$request->check_in, $request->check_out])
+                        ->orWhereBetween('check_out', [$request->check_in, $request->check_out])
+                        ->orWhere(function ($q) use ($request) {
+                            $q->where('check_in', '<=', $request->check_in)
+                                ->where('check_out', '>=', $request->check_out);
+                        });
+                })->first();
+
+            if ($existing) {
+                return redirect()->back()->with('error', 'Homestay telah ditempah pada tarikh tersebut.');
+            }
+
+            Booking::create($request->all());
+            return redirect()->back()->with('success', 'Tempahan berjaya disimpan.');
         }
-
-        Booking::create($request->all());
-        return redirect()->back()->with('success', 'Tempahan berjaya disimpan.');
     }
 
     /**
@@ -117,7 +167,7 @@ class BookingController extends Controller
             'check_out'     => 'required|date|after_or_equal:check_in',
             'dewasa'        => 'required|integer|min:0',
             'kanak'         => 'required|integer|min:0',
-            'homestay'      => 'required|in:Rumah Kayu Merbau,Rumah Batu Jati,Rumah Batu Meranti',
+            'homestay'      => 'required|in:Rumah Kayu Merbau,Rumah Batu Jati,Rumah Batu Meranti,Semua Rumah',
         ]);
 
         if ($validator->fails()) {
@@ -127,13 +177,13 @@ class BookingController extends Controller
         // Exclude the current booking from the conflict check.
         $existing = Booking::where('homestay', $request->homestay)
             ->where('id', '<>', $id)
-            ->where(function($query) use ($request) {
+            ->where(function ($query) use ($request) {
                 $query->whereBetween('check_in', [$request->check_in, $request->check_out])
-                      ->orWhereBetween('check_out', [$request->check_in, $request->check_out])
-                      ->orWhere(function($q) use ($request) {
-                          $q->where('check_in', '<=', $request->check_in)
+                    ->orWhereBetween('check_out', [$request->check_in, $request->check_out])
+                    ->orWhere(function ($q) use ($request) {
+                        $q->where('check_in', '<=', $request->check_in)
                             ->where('check_out', '>=', $request->check_out);
-                      });
+                    });
             })->first();
 
         if ($existing) {
@@ -156,11 +206,36 @@ class BookingController extends Controller
     }
 
     /**
-     * List all bookings in a table.
+     * List all bookings in a table with filters and pagination.
      */
-    public function list()
+    public function list(Request $request)
     {
-        $bookings = Booking::all();
+        $query = Booking::query();
+
+        // Apply filters if provided
+        if ($request->has('tujuan') && !empty($request->tujuan)) {
+            $query->where('tujuan', $request->tujuan);
+        }
+
+        if ($request->has('homestay') && !empty($request->homestay)) {
+            $query->where('homestay', $request->homestay);
+        }
+
+        if ($request->has('from_date') && !empty($request->from_date)) {
+            $query->where('check_in', '>=', $request->from_date);
+        }
+
+        if ($request->has('to_date') && !empty($request->to_date)) {
+            $query->where('check_out', '<=', $request->to_date);
+        }
+
+        if ($request->has('nama_penyewa') && !empty($request->nama_penyewa)) {
+            $query->where('nama_penyewa', 'like', '%' . $request->nama_penyewa . '%');
+        }
+
+        // Get all bookings with pagination
+        $bookings = $query->paginate(10);
+
         return view('bookings.list', compact('bookings'));
     }
 
@@ -187,7 +262,7 @@ class BookingController extends Controller
     public function updateDates(Request $request, $id)
     {
         $booking = Booking::findOrFail($id);
-        
+
         $validator = Validator::make($request->all(), [
             'check_in'  => 'required|date',
             'check_out' => 'required|date|after_or_equal:check_in',
@@ -200,13 +275,13 @@ class BookingController extends Controller
         // Check for overlapping bookings
         $existing = Booking::where('homestay', $booking->homestay)
             ->where('id', '!=', $id)
-            ->where(function($query) use ($request) {
+            ->where(function ($query) use ($request) {
                 $query->whereBetween('check_in', [$request->check_in, $request->check_out])
-                      ->orWhereBetween('check_out', [$request->check_in, $request->check_out])
-                      ->orWhere(function($q) use ($request) {
-                          $q->where('check_in', '<=', $request->check_in)
+                    ->orWhereBetween('check_out', [$request->check_in, $request->check_out])
+                    ->orWhere(function ($q) use ($request) {
+                        $q->where('check_in', '<=', $request->check_in)
                             ->where('check_out', '>=', $request->check_out);
-                      });
+                    });
             })->first();
 
         if ($existing) {

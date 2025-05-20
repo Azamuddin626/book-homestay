@@ -14,7 +14,7 @@ Route::get('/public-calendar', [BookingController::class, 'publicCalendar'])->na
 Route::get('/bookings/events', [BookingController::class, 'getEvents'])->name('bookings.events');
 
 // Authentication routes provided by Laravel Breeze
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 // Login and Register routes
 Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
@@ -23,10 +23,12 @@ Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('l
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
+// PUBLIC CALENDAR
+Route::get('/calendar', [BookingController::class, 'publicCalendar'])->name('calendar.public');
+
 // Admin routes
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/index', [BookingController::class, 'index'])->name('index');
-    Route::get('/calendar', [BookingController::class, 'publicCalendar'])->name('calendar.public');
     Route::get('/bookings/list', [BookingController::class, 'list'])->name('bookings.list');
     Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
     Route::get('/bookings/{id}/edit', [BookingController::class, 'edit'])->name('bookings.edit');

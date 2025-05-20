@@ -61,8 +61,10 @@
     <nav class="bg-white border-nature-clay dark:bg-gray-800 dark:border-gray-700 shadow-lg">
         <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
             <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
+                <img src="{{ asset('assets/images/LOGO PGH.png') }}" class="h-10 w-auto md:h-12"
+                    alt="Pulai Greens Homestay Logo">
                 <span
-                    class="self-center text-2xl font-semibold whitespace-nowrap text-nature-bark dark:text-white">Pulai
+                    class="self-center text-xl md:text-2xl font-semibold whitespace-nowrap text-nature-bark dark:text-white">Pulai
                     Greens Homestay</span>
             </a>
 
@@ -99,38 +101,43 @@
                 <ul
                     class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-nature-clay rounded-lg bg-white md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-800 dark:border-gray-700">
                     <li>
+                        <a href="/"
+                            class="block py-2 px-3 text-nature-bark rounded hover:bg-nature-clay md:hover:bg-transparent md:hover:text-nature-fern md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Home</a>
+                    </li>
+                    <li>
                         <a href="{{ route('calendar.public') }}"
-                            class="block py-2 px-3 text-nature-bark rounded hover:bg-nature-clay md:hover:bg-transparent md:hover:text-nature-fern md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Public
+                            class="block py-2 px-3 text-nature-bark rounded hover:bg-nature-clay md:hover:bg-transparent md:hover:text-nature-fern md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">
                             Calendar</a>
                     </li>
                     @auth
-                        @if (auth()->user()->roles == 'admin')
-                            <li>
-                                <a href="{{ route('index') }}"
-                                    class="block py-2 px-3 text-nature-bark rounded hover:bg-nature-clay md:hover:bg-transparent md:hover:text-nature-fern md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Calendar</a>
-                            </li>
-                            <li>
-                                <a href="{{ route('bookings.list') }}"
-                                    class="block py-2 px-3 text-nature-bark rounded hover:bg-nature-clay md:hover:bg-transparent md:hover:text-nature-fern md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Booking
-                                    List</a>
-                            </li>
-                        @endif
-                        <li>
-                            <form method="POST" action="{{ route('logout') }}" class="inline">
-                                @csrf
-                                <button type="submit"
-                                    class="block py-2 px-3 text-nature-bark rounded hover:bg-nature-clay md:hover:bg-transparent md:hover:text-nature-fern md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Logout</button>
-                            </form>
-                        </li>
+                    @if (auth()->user()->roles == 'admin')
+                    <li>
+                        <a href="{{ route('index') }}"
+                            class="block py-2 px-3 text-nature-bark rounded hover:bg-nature-clay md:hover:bg-transparent md:hover:text-nature-fern md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Admin
+                            Calendar</a>
+                    </li>
+                    <li>
+                        <a href="{{ route('bookings.list') }}"
+                            class="block py-2 px-3 text-nature-bark rounded hover:bg-nature-clay md:hover:bg-transparent md:hover:text-nature-fern md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Booking
+                            List</a>
+                    </li>
+                    @endif
+                    <li>
+                        <form method="POST" action="{{ route('logout') }}" class="inline">
+                            @csrf
+                            <button type="submit"
+                                class="block py-2 px-3 text-nature-bark rounded hover:bg-nature-clay md:hover:bg-transparent md:hover:text-nature-fern md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Logout</button>
+                        </form>
+                    </li>
                     @else
-                        <li>
-                            <a href="{{ route('login') }}"
-                                class="block py-2 px-3 text-nature-bark rounded hover:bg-nature-clay md:hover:bg-transparent md:hover:text-nature-fern md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Login</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('register') }}"
-                                class="block py-2 px-3 text-nature-bark rounded hover:bg-nature-clay md:hover:bg-transparent md:hover:text-nature-fern md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Register</a>
-                        </li>
+                    <li>
+                        <a href="{{ route('login') }}"
+                            class="block py-2 px-3 text-nature-bark rounded hover:bg-nature-clay md:hover:bg-transparent md:hover:text-nature-fern md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Login</a>
+                    </li>
+                    {{-- <li>
+                        <a href="{{ route('register') }}"
+                            class="block py-2 px-3 text-nature-bark rounded hover:bg-nature-clay md:hover:bg-transparent md:hover:text-nature-fern md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Register</a>
+                    </li> --}}
                     @endauth
                 </ul>
             </div>
