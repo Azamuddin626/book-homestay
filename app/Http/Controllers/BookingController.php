@@ -8,9 +8,128 @@ use Illuminate\Support\Facades\Validator;
 
 class BookingController extends Controller
 {
+
     /**
-     * Display the calendar and booking form.
+     * Show the form for creating a new public booking.
      */
+    public function publicCreate()
+    {
+        return view('bookings.public-create');
+    }
+    /**
+     * Store a new lead and prepare WhatsApp redirect.
+     */
+    public function publicStore(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'tujuan'        => 'required|in:Menginap,Kenduri',
+            'nama_penyewa'  => 'required|string|max:255',
+            'alamat'        => 'required|string|max:255',
+            'telefon'       => 'required|string|max:20',
+            'check_in'      => 'required|date',
+            'check_out'     => 'required|date|after_or_equal:check_in',
+            'dewasa'        => 'required|integer|min:0',
+            'kanak'         => 'required|integer|min:0',
+            'homestay'      => 'required|in:Rumah Kayu Merbau,Rumah Batu Jati,Rumah Batu Meranti,Semua Rumah',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Check for existing bookings at the same time
+        if ($request->homestay === 'Semua Rumah') {
+            $homes = ['Rumah Kayu Merbau', 'Rumah Batu Jati', 'Rumah Batu Meranti'];
+
+            foreach ($homes as $home) {
+                $existing = Booking::where('homestay', $home)
+                    ->where(function ($query) use ($request) {
+                        $query->whereBetween('check_in', [$request->check_in, $request->check_out])
+                            ->orWhereBetween('check_out', [$request->check_in, $request->check_out])
+                            ->orWhere(function ($q) use ($request) {
+                                $q->where('check_in', '<=', $request->check_in)
+                                    ->where('check_out', '>=', $request->check_out);
+                            });
+                    })->first();
+
+                if ($existing) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $home . ' sudah ditempah untuk tarikh tersebut.'
+                    ], 400);
+                }
+            }
+        } else {
+            // Check for existing booking at the selected house
+            $existing = Booking::where('homestay', $request->homestay)
+                ->where(function ($query) use ($request) {
+                    $query->whereBetween('check_in', [$request->check_in, $request->check_out])
+                        ->orWhereBetween('check_out', [$request->check_in, $request->check_out])
+                        ->orWhere(function ($q) use ($request) {
+                            $q->where('check_in', '<=', $request->check_in)
+                                ->where('check_out', '>=', $request->check_out);
+                        });
+                })->first();
+
+            if ($existing) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $request->homestay . ' sudah ditempah untuk tarikh tersebut.'
+                ], 400);
+            }
+        }
+
+        // Try to create a lead in the leads table first
+        try {
+            \App\Models\Lead::create([
+                'tujuan'       => $request->tujuan,
+                'nama_penyewa' => $request->nama_penyewa,
+                'alamat'       => $request->alamat,
+                'telefon'      => $request->telefon,
+                'check_in'     => $request->check_in,
+                'check_out'    => $request->check_out,
+                'dewasa'       => $request->dewasa,
+                'kanak'        => $request->kanak,
+                'homestay'     => $request->homestay,
+                'status'       => 'pending'
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Permintaan tempahan anda telah direkodkan.'
+            ]);
+        } catch (\Exception $e) {
+            // If the leads table doesn't exist yet, try to save as a booking with lead status
+            try {
+                Booking::create([
+                    'tujuan'       => $request->tujuan,
+                    'nama_penyewa' => $request->nama_penyewa,
+                    'alamat'       => $request->alamat,
+                    'check_in'     => $request->check_in,
+                    'check_out'    => $request->check_out,
+                    'dewasa'       => $request->dewasa,
+                    'kanak'        => $request->kanak,
+                    'homestay'     => $request->homestay,
+                    'status'       => 'lead' // Mark as a lead in the bookings table
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Permintaan tempahan anda telah direkodkan.'
+                ]);
+            } catch (\Exception $innerEx) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ralat semasa memproses permintaan anda: ' . $e->getMessage() . ' ' . $innerEx->getMessage()
+                ], 500);
+            }
+        }
+    }
+
     public function index()
     {
         return view('bookings.index');
@@ -211,32 +330,59 @@ class BookingController extends Controller
     public function list(Request $request)
     {
         $query = Booking::query();
+        $pastQuery = Booking::query();
+        $today = date('Y-m-d');
 
         // Apply filters if provided
         if ($request->has('tujuan') && !empty($request->tujuan)) {
             $query->where('tujuan', $request->tujuan);
+            $pastQuery->where('tujuan', $request->tujuan);
         }
 
         if ($request->has('homestay') && !empty($request->homestay)) {
             $query->where('homestay', $request->homestay);
+            $pastQuery->where('homestay', $request->homestay);
         }
 
         if ($request->has('from_date') && !empty($request->from_date)) {
             $query->where('check_in', '>=', $request->from_date);
+            $pastQuery->where('check_in', '>=', $request->from_date);
         }
 
         if ($request->has('to_date') && !empty($request->to_date)) {
             $query->where('check_out', '<=', $request->to_date);
+            $pastQuery->where('check_out', '<=', $request->to_date);
         }
 
         if ($request->has('nama_penyewa') && !empty($request->nama_penyewa)) {
             $query->where('nama_penyewa', 'like', '%' . $request->nama_penyewa . '%');
+            $pastQuery->where('nama_penyewa', 'like', '%' . $request->nama_penyewa . '%');
         }
 
-        // Get all bookings with pagination
-        $bookings = $query->paginate(10);
+        if ($request->has('status') && !empty($request->status)) {
+            $query->where('status', $request->status);
+            $pastQuery->where('status', $request->status);
+        } else {
+            // By default, exclude lead entries from the regular booking list
+            $query->where(function ($q) {
+                $q->where('status', '!=', 'lead')
+                    ->orWhereNull('status');
+            });
+            $pastQuery->where(function ($q) {
+                $q->where('status', '!=', 'lead')
+                    ->orWhereNull('status');
+            });
+        }
 
-        return view('bookings.list', compact('bookings'));
+        // Filter upcoming and past bookings
+        $query->where('check_out', '>=', $today)->orderBy('check_in', 'asc');
+        $pastQuery->where('check_out', '<', $today)->orderBy('check_out', 'desc');
+
+        // Get bookings with pagination
+        $upcomingBookings = $query->paginate(10, ['*'], 'upcoming_page');
+        $pastBookings = $pastQuery->paginate(5, ['*'], 'past_page');
+
+        return view('bookings.list', compact('upcomingBookings', 'pastBookings'));
     }
 
     /**

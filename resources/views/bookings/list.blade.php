@@ -29,10 +29,35 @@
         </div>
         @endif
 
+        <!-- Information Notice -->
+        <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400"
+            role="alert">
+            <div class="font-medium">Paparan Tempahan</div>
+            <ul class="mt-1.5 ml-4 list-disc list-inside">
+                <li>Tempahan Akan Datang - Menunjukkan maksimum 10 tempahan yang masih aktif</li>
+                <li>Tempahan Lepas - Menunjukkan 5 tempahan sejarah untuk prestasi yang lebih baik</li>
+                <li>Setiap seksyen mempunyai penomboran halaman berasingan untuk kemudahan navigasi</li>
+            </ul>
+        </div>
+
         <!-- Filter Form -->
         <div class="p-4 mb-4 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600">
             <form action="{{ route('bookings.list') }}" method="GET">
-                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
+                    <div>
+                        <label for="status" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Status
+                        </label>
+                        <select id="status" name="status"
+                            class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
+                            <option value="">Semua Tempahan</option>
+                            <option value="confirmed" {{ request('status')=='confirmed' ? 'selected' : '' }}>Tempahan
+                                Disahkan
+                            </option>
+                            <option value="lead" {{ request('status')=='lead' ? 'selected' : '' }}>Permohonan Baru
+                            </option>
+                        </select>
+                    </div>
+
                     <div>
                         <label for="tujuan"
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tujuan</label>
@@ -124,92 +149,122 @@
             </form>
         </div>
 
-        <!-- Upcoming Bookings (Current) -->
-        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Tempahan Akan Datang</h2>
-        <div class="relative overflow-x-auto mb-8">
-            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                    <tr>
-                        <th scope="col" class="px-6 py-3">Nama Penyewa</th>
-                        <th scope="col" class="px-6 py-3">Tujuan</th>
-                        <th scope="col" class="px-6 py-3">Homestay</th>
-                        <th scope="col" class="px-6 py-3">Tarikh Masuk</th>
-                        <th scope="col" class="px-6 py-3">Tarikh Keluar</th>
-                        <th scope="col" class="px-6 py-3">Tindakan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @php
-                    $today = date('Y-m-d');
-                    $upcomingBookings = $bookings->filter(function($booking) use ($today) {
-                    return $booking->check_out >= $today;
-                    })->sortBy('check_in');
-                    $hasUpcoming = $upcomingBookings->count() > 0;
-                    @endphp
-
-                    @if($hasUpcoming)
-                    @foreach($upcomingBookings as $booking)
-                    <tr
-                        class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                        <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                            {{ $booking->nama_penyewa }}
-                        </td>
-                        <td class="px-6 py-4">{{ $booking->tujuan }}</td>
-                        <td class="px-6 py-4">{{ $booking->homestay }}</td>
-                        <td class="px-6 py-4">{{ date('d/m/Y', strtotime($booking->check_in)) }}</td>
-                        <td class="px-6 py-4">{{ date('d/m/Y', strtotime($booking->check_out)) }}</td>
-                        <td class="px-6 py-4">
-                            <div class="flex space-x-2">
-                                <button data-modal-target="editModal" data-modal-toggle="editModal"
-                                    data-booking-id="{{ $booking->id }}"
-                                    class="font-medium text-primary-600 dark:text-primary-500 hover:underline">
-                                    Kemaskini
-                                </button>
-                                <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST"
-                                    class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                        class="font-medium text-red-600 dark:text-red-500 hover:underline"
-                                        onclick="return confirm('Adakah anda pasti untuk memadam tempahan ini?')">
-                                        Padam
+        <!-- Upcoming Bookings Card -->
+        <div
+            class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800 mb-6">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Tempahan Akan Datang</h2>
+            <div class="relative overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Nama Penyewa</th>
+                            <th scope="col" class="px-6 py-3">Tujuan</th>
+                            <th scope="col" class="px-6 py-3">Homestay</th>
+                            <th scope="col" class="px-6 py-3">Tarikh Masuk</th>
+                            <th scope="col" class="px-6 py-3">Tarikh Keluar</th>
+                            <th scope="col" class="px-6 py-3">Status</th>
+                            <th scope="col" class="px-6 py-3">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if($upcomingBookings->count() > 0)
+                        @foreach($upcomingBookings as $booking)
+                        <tr
+                            class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                                {{ $booking->nama_penyewa }}
+                            </td>
+                            <td class="px-6 py-4">{{ $booking->tujuan }}</td>
+                            <td class="px-6 py-4">{{ $booking->homestay }}</td>
+                            <td class="px-6 py-4">{{ date('d/m/Y', strtotime($booking->check_in)) }}</td>
+                            <td class="px-6 py-4">{{ date('d/m/Y', strtotime($booking->check_out)) }}</td>
+                            <td class="px-6 py-4">
+                                @if($booking->status == 'lead')
+                                <span
+                                    class="px-2 py-1 text-xs font-medium text-amber-700 bg-amber-100 rounded-full">Permohonan</span>
+                                @else
+                                <span
+                                    class="px-2 py-1 text-xs font-medium text-emerald-700 bg-emerald-100 rounded-full">Disahkan</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex space-x-2">
+                                    @if($booking->status == 'lead')
+                                    <button data-modal-target="editModal" data-modal-toggle="editModal"
+                                        data-booking-id="{{ $booking->id }}"
+                                        class="font-medium text-primary-600 dark:text-primary-500 hover:underline">
+                                        Kemaskini
                                     </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforeach
-                    @else
-                    <tr class="bg-white dark:bg-gray-800">
-                        <td colspan="6" class="px-6 py-4 text-center">Tiada tempahan akan datang</td>
-                    </tr>
-                    @endif
-                </tbody>
-            </table>
+                                    <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST"
+                                        class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="font-medium text-red-600 dark:text-red-500 hover:underline"
+                                            onclick="return confirm('Adakah anda pasti untuk memadam tempahan ini?')">
+                                            Padam
+                                        </button>
+                                    </form>
+                                    <a href="https://wa.me/601110106876?text=Mengenai%20permohonan%20tempahan%20{{ urlencode($booking->nama_penyewa) }}%20pada%20{{ urlencode(date('d/m/Y', strtotime($booking->check_in))) }}"
+                                        target="_blank"
+                                        class="font-medium text-emerald-600 dark:text-emerald-500 hover:underline">
+                                        WhatsApp
+                                    </a>
+                                    @else
+                                    <button data-modal-target="editModal" data-modal-toggle="editModal"
+                                        data-booking-id="{{ $booking->id }}"
+                                        class="font-medium text-primary-600 dark:text-primary-500 hover:underline">
+                                        Kemaskini
+                                    </button>
+                                    <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST"
+                                        class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="font-medium text-red-600 dark:text-red-500 hover:underline"
+                                            onclick="return confirm('Adakah anda pasti untuk memadam tempahan ini?')">
+                                            Padam
+                                        </button>
+                                    </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                        @else
+                        <tr class="bg-white dark:bg-gray-800">
+                            <td colspan="7" class="px-6 py-4 text-center">Tiada tempahan akan datang</td>
+                        </tr>
+                        @endif
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination for Upcoming Bookings -->
+            <div class="mt-6">
+                {{ $upcomingBookings->appends(['past_page' => request('past_page')])->links() }}
+            </div>
         </div>
 
-        <!-- Past Bookings -->
-        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Tempahan Lepas</h2>
-        <div class="relative overflow-x-auto">
-            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                    <tr>
-                        <th scope="col" class="px-6 py-3">Nama Penyewa</th>
-                        <th scope="col" class="px-6 py-3">Tujuan</th>
-                        <th scope="col" class="px-6 py-3">Homestay</th>
-                        <th scope="col" class="px-6 py-3">Tarikh Masuk</th>
-                        <th scope="col" class="px-6 py-3">Tarikh Keluar</th>
-                        <th scope="col" class="px-6 py-3">Tindakan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @php
-                    $pastBookings = $bookings->filter(function($booking) use ($today) {
-                    return $booking->check_out < $today; })->sortByDesc('check_out');
-                        $hasPast = $pastBookings->count() > 0;
-                        @endphp
-
-                        @if($hasPast)
+        <!-- Past Bookings Card -->
+        <div
+            class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Tempahan Lepas</h2>
+            <div class="relative overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Nama Penyewa</th>
+                            <th scope="col" class="px-6 py-3">Tujuan</th>
+                            <th scope="col" class="px-6 py-3">Homestay</th>
+                            <th scope="col" class="px-6 py-3">Tarikh Masuk</th>
+                            <th scope="col" class="px-6 py-3">Tarikh Keluar</th>
+                            <th scope="col" class="px-6 py-3">Status</th>
+                            <th scope="col" class="px-6 py-3">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if($pastBookings->count() > 0)
                         @foreach($pastBookings as $booking)
                         <tr
                             class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
@@ -220,6 +275,15 @@
                             <td class="px-6 py-4">{{ $booking->homestay }}</td>
                             <td class="px-6 py-4">{{ date('d/m/Y', strtotime($booking->check_in)) }}</td>
                             <td class="px-6 py-4">{{ date('d/m/Y', strtotime($booking->check_out)) }}</td>
+                            <td class="px-6 py-4">
+                                @if($booking->status == 'lead')
+                                <span
+                                    class="px-2 py-1 text-xs font-medium text-amber-700 bg-amber-100 rounded-full">Permohonan</span>
+                                @else
+                                <span
+                                    class="px-2 py-1 text-xs font-medium text-emerald-700 bg-emerald-100 rounded-full">Disahkan</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4">
                                 <div class="flex space-x-2">
                                     <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST"
@@ -238,16 +302,17 @@
                         @endforeach
                         @else
                         <tr class="bg-white dark:bg-gray-800">
-                            <td colspan="6" class="px-6 py-4 text-center">Tiada tempahan lepas</td>
+                            <td colspan="7" class="px-6 py-4 text-center">Tiada tempahan lepas</td>
                         </tr>
                         @endif
-                </tbody>
-            </table>
-        </div>
+                    </tbody>
+                </table>
+            </div>
 
-        <!-- Pagination -->
-        <div class="mt-6">
-            {{ $bookings->appends(request()->query())->links() }}
+            <!-- Pagination for Past Bookings -->
+            <div class="mt-6">
+                {{ $pastBookings->appends(['upcoming_page' => request('upcoming_page')])->links() }}
+            </div>
         </div>
     </div>
 </div>

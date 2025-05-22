@@ -5,22 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Booking extends Model
+class Lead extends Model
 {
     use HasFactory;
 
-    protected $table = 'bookings';
-    protected $primaryKey = 'id';
-
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
-        'tujuan',
         'nama_penyewa',
         'alamat',
+        'telefon',
+        'tujuan',
+        'homestay',
         'check_in',
         'check_out',
         'dewasa',
         'kanak',
-        'homestay',
-        'status',
+        'status'
     ];
 }

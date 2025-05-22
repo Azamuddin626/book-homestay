@@ -5,6 +5,33 @@
 @section('content')
 <div class="container mx-auto p-4">
     <h1 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-4">Kalendar Pulai Greens Homestay</h1>
+
+    <!-- Notification and Booking Button -->
+    <div
+        class="mb-6 bg-nature-leaf/30 dark:bg-primary-900/30 border border-nature-fern/30 dark:border-primary-700/30 rounded-lg p-4 flex flex-col md:flex-row md:items-center justify-between">
+        <div class="mb-3 md:mb-0">
+            <p class="text-nature-bark dark:text-white font-medium">
+                <svg class="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Sila semak tarikh kekosongan untuk homestay sebelum membuat tempahan.
+            </p>
+            <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Tarikh yang bertanda pada kalendar telah ditempah.
+            </p>
+        </div>
+        <a href="{{ route('bookings.public.create') }}"
+            class="inline-flex items-center bg-nature-fern hover:bg-nature-moss text-white font-medium py-2 px-4 rounded-lg transition duration-300">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            Tempah Sekarang
+        </a>
+    </div>
+
     <div
         class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
         <!-- Filter Section -->
