@@ -29,242 +29,92 @@
         </div>
         @endif
 
-        <!-- Information Notice -->
-        <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400"
-            role="alert">
-            <div class="font-medium">Paparan Tempahan</div>
-            <ul class="mt-1.5 ml-4 list-disc list-inside">
-                <li>Tempahan Akan Datang - Menunjukkan maksimum 10 tempahan yang masih aktif</li>
-                <li>Tempahan Lepas - Menunjukkan 5 tempahan sejarah untuk prestasi yang lebih baik</li>
-                <li>Setiap seksyen mempunyai penomboran halaman berasingan untuk kemudahan navigasi</li>
-            </ul>
-        </div>
+        <!-- Upcoming Bookings (Current) -->
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Tempahan Akan Datang</h2>
+        <div class="relative overflow-x-auto mb-8">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Nama Penyewa</th>
+                        <th scope="col" class="px-6 py-3">Tujuan</th>
+                        <th scope="col" class="px-6 py-3">Homestay</th>
+                        <th scope="col" class="px-6 py-3">Tarikh Masuk</th>
+                        <th scope="col" class="px-6 py-3">Tarikh Keluar</th>
+                        <th scope="col" class="px-6 py-3">Tindakan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                    $today = date('Y-m-d');
+                    $upcomingBookings = $bookings->filter(function($booking) use ($today) {
+                    return $booking->check_out >= $today;
+                    })->sortBy('check_in');
+                    $hasUpcoming = $upcomingBookings->count() > 0;
+                    @endphp
 
-        <!-- Filter Form -->
-        <div class="p-4 mb-4 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600">
-            <form action="{{ route('bookings.list') }}" method="GET">
-                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
-                    <div>
-                        <label for="status" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Status
-                        </label>
-                        <select id="status" name="status"
-                            class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
-                            <option value="">Semua Tempahan</option>
-                            <option value="confirmed" {{ request('status')=='confirmed' ? 'selected' : '' }}>Tempahan
-                                Disahkan
-                            </option>
-                            <option value="lead" {{ request('status')=='lead' ? 'selected' : '' }}>Permohonan Baru
-                            </option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="tujuan"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tujuan</label>
-                        <select id="tujuan" name="tujuan"
-                            class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
-                            <option value="">Semua</option>
-                            <option value="Menginap" {{ request('tujuan')=='Menginap' ? 'selected' : '' }}>Menginap
-                            </option>
-                            <option value="Kenduri" {{ request('tujuan')=='Kenduri' ? 'selected' : '' }}>Kenduri
-                            </option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="homestay"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Homestay</label>
-                        <select id="homestay" name="homestay"
-                            class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
-                            <option value="">Semua</option>
-                            <option value="Rumah Kayu Merbau" {{ request('homestay')=='Rumah Kayu Merbau' ? 'selected'
-                                : '' }}>Rumah Kayu Merbau</option>
-                            <option value="Rumah Batu Jati" {{ request('homestay')=='Rumah Batu Jati' ? 'selected' : ''
-                                }}>Rumah Batu Jati</option>
-                            <option value="Rumah Batu Meranti" {{ request('homestay')=='Rumah Batu Meranti' ? 'selected'
-                                : '' }}>Rumah Batu Meranti</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="from_date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Dari
-                            Tarikh</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                    <path
-                                        d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                                </svg>
-                            </div>
-                            <input datepicker datepicker-format="yyyy-mm-dd" type="text" id="from_date" name="from_date"
-                                value="{{ request('from_date') }}"
-                                class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full ps-10 p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                placeholder="YYYY-MM-DD">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label for="to_date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Hingga
-                            Tarikh</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                    <path
-                                        d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                                </svg>
-                            </div>
-                            <input datepicker datepicker-format="yyyy-mm-dd" type="text" id="to_date" name="to_date"
-                                value="{{ request('to_date') }}"
-                                class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full ps-10 p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                                placeholder="YYYY-MM-DD">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label for="nama_penyewa"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama Penyewa</label>
-                        <input type="text" id="nama_penyewa" name="nama_penyewa" value="{{ request('nama_penyewa') }}"
-                            class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                            placeholder="Carian nama...">
-                    </div>
-                </div>
-
-                <div class="flex justify-end">
-                    <button type="submit"
-                        class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                        <svg class="w-4 h-4 mr-2 inline" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                            fill="none" viewBox="0 0 20 20">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                        </svg>
-                        Tapis
-                    </button>
-                    <a href="{{ route('bookings.list') }}"
-                        class="text-gray-700 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center ml-2 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700 dark:focus:ring-primary-800 border border-gray-300 dark:border-gray-500">
-                        Reset
-                    </a>
-                </div>
-            </form>
-        </div>
-
-        <!-- Upcoming Bookings Card -->
-        <div
-            class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800 mb-6">
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Tempahan Akan Datang</h2>
-            <div class="relative overflow-x-auto">
-                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                        <tr>
-                            <th scope="col" class="px-6 py-3">Nama Penyewa</th>
-                            <th scope="col" class="px-6 py-3">Tujuan</th>
-                            <th scope="col" class="px-6 py-3">Homestay</th>
-                            <th scope="col" class="px-6 py-3">Tarikh Masuk</th>
-                            <th scope="col" class="px-6 py-3">Tarikh Keluar</th>
-                            <th scope="col" class="px-6 py-3">Status</th>
-                            <th scope="col" class="px-6 py-3">Tindakan</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if($upcomingBookings->count() > 0)
-                        @foreach($upcomingBookings as $booking)
-                        <tr
-                            class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                            <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                                {{ $booking->nama_penyewa }}
-                            </td>
-                            <td class="px-6 py-4">{{ $booking->tujuan }}</td>
-                            <td class="px-6 py-4">{{ $booking->homestay }}</td>
-                            <td class="px-6 py-4">{{ date('d/m/Y', strtotime($booking->check_in)) }}</td>
-                            <td class="px-6 py-4">{{ date('d/m/Y', strtotime($booking->check_out)) }}</td>
-                            <td class="px-6 py-4">
-                                @if($booking->status == 'lead')
-                                <span
-                                    class="px-2 py-1 text-xs font-medium text-amber-700 bg-amber-100 rounded-full">Permohonan</span>
-                                @else
-                                <span
-                                    class="px-2 py-1 text-xs font-medium text-emerald-700 bg-emerald-100 rounded-full">Disahkan</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="flex space-x-2">
-                                    @if($booking->status == 'lead')
-                                    <button data-modal-target="editModal" data-modal-toggle="editModal"
-                                        data-booking-id="{{ $booking->id }}"
-                                        class="font-medium text-primary-600 dark:text-primary-500 hover:underline">
-                                        Kemaskini
+                    @if($hasUpcoming)
+                    @foreach($upcomingBookings as $booking)
+                    <tr
+                        class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                            {{ $booking->nama_penyewa }}
+                        </td>
+                        <td class="px-6 py-4">{{ $booking->tujuan }}</td>
+                        <td class="px-6 py-4">{{ $booking->homestay }}</td>
+                        <td class="px-6 py-4">{{ date('d/m/Y', strtotime($booking->check_in)) }}</td>
+                        <td class="px-6 py-4">{{ date('d/m/Y', strtotime($booking->check_out)) }}</td>
+                        <td class="px-6 py-4">
+                            <div class="flex space-x-2">
+                                <button data-modal-target="editModal" data-modal-toggle="editModal"
+                                    data-booking-id="{{ $booking->id }}"
+                                    class="font-medium text-primary-600 dark:text-primary-500 hover:underline">
+                                    Kemaskini
+                                </button>
+                                <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST"
+                                    class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                        class="font-medium text-red-600 dark:text-red-500 hover:underline"
+                                        onclick="return confirm('Adakah anda pasti untuk memadam tempahan ini?')">
+                                        Padam
                                     </button>
-                                    <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST"
-                                        class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            class="font-medium text-red-600 dark:text-red-500 hover:underline"
-                                            onclick="return confirm('Adakah anda pasti untuk memadam tempahan ini?')">
-                                            Padam
-                                        </button>
-                                    </form>
-                                    <a href="https://wa.me/601110106876?text=Mengenai%20permohonan%20tempahan%20{{ urlencode($booking->nama_penyewa) }}%20pada%20{{ urlencode(date('d/m/Y', strtotime($booking->check_in))) }}"
-                                        target="_blank"
-                                        class="font-medium text-emerald-600 dark:text-emerald-500 hover:underline">
-                                        WhatsApp
-                                    </a>
-                                    @else
-                                    <button data-modal-target="editModal" data-modal-toggle="editModal"
-                                        data-booking-id="{{ $booking->id }}"
-                                        class="font-medium text-primary-600 dark:text-primary-500 hover:underline">
-                                        Kemaskini
-                                    </button>
-                                    <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST"
-                                        class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            class="font-medium text-red-600 dark:text-red-500 hover:underline"
-                                            onclick="return confirm('Adakah anda pasti untuk memadam tempahan ini?')">
-                                            Padam
-                                        </button>
-                                    </form>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
-                        @else
-                        <tr class="bg-white dark:bg-gray-800">
-                            <td colspan="7" class="px-6 py-4 text-center">Tiada tempahan akan datang</td>
-                        </tr>
-                        @endif
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination for Upcoming Bookings -->
-            <div class="mt-6">
-                {{ $upcomingBookings->appends(['past_page' => request('past_page')])->links() }}
-            </div>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                    @else
+                    <tr class="bg-white dark:bg-gray-800">
+                        <td colspan="6" class="px-6 py-4 text-center">Tiada tempahan akan datang</td>
+                    </tr>
+                    @endif
+                </tbody>
+            </table>
         </div>
 
-        <!-- Past Bookings Card -->
-        <div
-            class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Tempahan Lepas</h2>
-            <div class="relative overflow-x-auto">
-                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                        <tr>
-                            <th scope="col" class="px-6 py-3">Nama Penyewa</th>
-                            <th scope="col" class="px-6 py-3">Tujuan</th>
-                            <th scope="col" class="px-6 py-3">Homestay</th>
-                            <th scope="col" class="px-6 py-3">Tarikh Masuk</th>
-                            <th scope="col" class="px-6 py-3">Tarikh Keluar</th>
-                            <th scope="col" class="px-6 py-3">Status</th>
-                            <th scope="col" class="px-6 py-3">Tindakan</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if($pastBookings->count() > 0)
+        <!-- Past Bookings -->
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Tempahan Lepas</h2>
+        <div class="relative overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Nama Penyewa</th>
+                        <th scope="col" class="px-6 py-3">Tujuan</th>
+                        <th scope="col" class="px-6 py-3">Homestay</th>
+                        <th scope="col" class="px-6 py-3">Tarikh Masuk</th>
+                        <th scope="col" class="px-6 py-3">Tarikh Keluar</th>
+                        <th scope="col" class="px-6 py-3">Tindakan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                    $pastBookings = $bookings->filter(function($booking) use ($today) {
+                    return $booking->check_out < $today; })->sortByDesc('check_out');
+                        $hasPast = $pastBookings->count() > 0;
+                        @endphp
+
+                        @if($hasPast)
                         @foreach($pastBookings as $booking)
                         <tr
                             class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
@@ -276,15 +126,6 @@
                             <td class="px-6 py-4">{{ date('d/m/Y', strtotime($booking->check_in)) }}</td>
                             <td class="px-6 py-4">{{ date('d/m/Y', strtotime($booking->check_out)) }}</td>
                             <td class="px-6 py-4">
-                                @if($booking->status == 'lead')
-                                <span
-                                    class="px-2 py-1 text-xs font-medium text-amber-700 bg-amber-100 rounded-full">Permohonan</span>
-                                @else
-                                <span
-                                    class="px-2 py-1 text-xs font-medium text-emerald-700 bg-emerald-100 rounded-full">Disahkan</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4">
                                 <div class="flex space-x-2">
                                     <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST"
                                         class="inline">
@@ -302,18 +143,18 @@
                         @endforeach
                         @else
                         <tr class="bg-white dark:bg-gray-800">
-                            <td colspan="7" class="px-6 py-4 text-center">Tiada tempahan lepas</td>
+                            <td colspan="6" class="px-6 py-4 text-center">Tiada tempahan lepas</td>
                         </tr>
                         @endif
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination for Past Bookings -->
-            <div class="mt-6">
-                {{ $pastBookings->appends(['upcoming_page' => request('upcoming_page')])->links() }}
-            </div>
+                </tbody>
+            </table>
         </div>
+
+        {{--
+        <!-- Pagination -->
+        <div class="mt-4">
+            {{ $bookings->links() }}
+        </div> --}}
     </div>
 </div>
 

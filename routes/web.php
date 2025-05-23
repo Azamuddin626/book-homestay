@@ -25,8 +25,6 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 
 // PUBLIC CALENDAR
 Route::get('/calendar', [BookingController::class, 'publicCalendar'])->name('calendar.public');
-Route::get('/bookings/create', [BookingController::class, 'publicCreate'])->name('bookings.public.create');
-Route::post('/bookings/public/store', [BookingController::class, 'publicStore'])->name('bookings.public.store');
 
 // Admin routes
 Route::middleware(['auth', 'admin'])->group(function () {
@@ -39,10 +37,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/bookings/{id}/edit-page', [BookingController::class, 'editPage'])->name('bookings.editPage');
     Route::post('/bookings/{id}/update-dates', [BookingController::class, 'updateDates'])->name('bookings.updateDates');
 });
-
-// Leads management routes
-Route::get('/leads', [App\Http\Controllers\LeadController::class, 'index'])->name('leads.index')->middleware('auth');
-Route::put('/leads/{lead}/update-status', [App\Http\Controllers\LeadController::class, 'updateStatus'])->name('leads.update-status')->middleware('auth');
 
 // Dashboard route
 Route::get('/dashboard', function () {

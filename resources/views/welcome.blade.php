@@ -1173,11 +1173,11 @@
                                 Adakah deposit diperlukan untuk tempahan?
                             </div>
                             <div class="collapse-content text-sm text-gray-700 dark:text-gray-300">
-                                Ya, deposit pengesahan diperlukan untuk mengesahkan tempahan anda. Baki bayaran penuh
-                                perlu
-                                dijelaskan selewat-lewatnya sehari (untuk pelanggan yang menginap) dan seminggu (untuk
-                                pelanggan
-                                yang membuat kenduri) sebelum tarikh daftar masuk.
+                                Ya, Secure Deposit diperlukan untuk mengesahkan tempahan anda. Kemudian, bayaran penuh
+                                (tidak termasuk deposit) perlu dijelaskan selewat-lewatnya sehari (untuk pelanggan yang
+                                menginap) dan seminggu (untuk
+                                pelanggan yang membuat kenduri) sebelum tarikh daftar masuk.
+                                pelanggan yang membuat kenduri) sebelum tarikh daftar masuk.
                             </div>
                         </div>
 
@@ -1245,8 +1245,22 @@
                                 Bagaimana proses daftar masuk (check-in)?
                             </div>
                             <div class="collapse-content text-sm text-gray-700 dark:text-gray-300">
-                                Proses daftar masuk adalah secara mengambil kunci di dalam loker kunci. Arahan lanjut
-                                akan diberikan sebelum tarikh daftar masuk dan selepas pembayaran penuh.
+                                <p>Proses daftar masuk adalah secara mengambil kunci di dalam loker kunci. Arahan lanjut
+                                    akan diberikan sebelum tarikh daftar masuk dan selepas pembayaran penuh.</p>
+                                <div class="mt-3">
+                                    <button data-modal-target="keyGuidelinesModal"
+                                        data-modal-toggle="keyGuidelinesModal"
+                                        class="inline-flex items-center gap-2 bg-nature-stone text-[#5d574a] hover:bg-nature-clay dark:bg-primary-700 dark:text-white dark:hover:bg-primary-600 font-medium rounded-md px-3 py-1.5 text-xs transition hover:scale-[1.02] duration-300">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                                            <path fill-rule="evenodd"
+                                                d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                                                clip-rule="evenodd"></path>
+                                        </svg>
+                                        Lihat Panduan Kunci
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1526,7 +1540,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M12 11c1.38 0 2.5-1.12 2.5-2.5S13.38 6 12 6s-2.5 1.12-2.5 2.5S10.62 11 12 11z" />
                                     <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M12 22s8-7.58 8-13A8 8 0 004 9c0 5.42 8 13 8 13z" />
+                                        d="M12 22s8-7.58 8-13A8 8 0 004 9c0 5.42 8 13 8 13z" clip-rule="evenodd"></path>
                                 </svg>
                             </span>
                             <div>
@@ -1546,7 +1560,7 @@
                         class="bg-nature-stone text-[#5d574a] hover:bg-nature-clay dark:bg-primary-700 dark:text-white dark:hover:bg-primary-600 font-medium rounded-md shadow-md px-4 py-2 text-sm transition transform hover:scale-[1.02] duration-300 flex items-center gap-2 w-full justify-center">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path
-                                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884z" />
                         </svg>
                         Hubungi di WhatsApp
                     </a>
@@ -1564,6 +1578,9 @@
         </div>
     </div>
 </section>
+
+<!-- Include Key Guidelines Modal -->
+@include('components.key-guidelines-modal')
 
 <!-- Scroll to Top Button -->
 <button id="scrollToTopBtn" title="Go to top"

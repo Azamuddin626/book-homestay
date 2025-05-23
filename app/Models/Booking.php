@@ -21,6 +21,5 @@ class Booking extends Model
         'dewasa',
         'kanak',
         'homestay',
-        'status',
     ];
 }

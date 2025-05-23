@@ -118,11 +118,8 @@
                     </li>
                     <li>
                         <a href="{{ route('bookings.list') }}"
-                            class="block py-2 px-3 text-nature-bark rounded hover:bg-nature-clay md:hover:bg-transparent md:hover:text-nature-fern md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Tempahan</a>
-                    </li>
-                    <li>
-                        <a href="{{ route('leads.index') }}"
-                            class="block py-2 px-3 text-nature-bark rounded hover:bg-nature-clay md:hover:bg-transparent md:hover:text-nature-fern md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Pertanyaan</a>
+                            class="block py-2 px-3 text-nature-bark rounded hover:bg-nature-clay md:hover:bg-transparent md:hover:text-nature-fern md:p-0 dark:text-white md:dark:hover:text-primary-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Booking
+                            List</a>
                     </li>
                     @endif
                     <li>
